@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum</title>
+    <script type="module">
+        import { io } from 'https://cdn.socket.io/4.3.2/socket.io.esm.min.js'
+
+        const form = document.getElementById('form')
+        const input = document.getElementById('input')
+        const messages = document.getElementById('messages')
+        const loginForm = document.getElementById('loginForm')
+        const usernameInput = document.getElementById('username')
+
+        let username = ''
+
+        // Función para forzar el scroll hacia el final
+        const scrollToBottom = () => {
+            messages.scrollTop = messages.scrollHeight
+        };
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault()
+            username = usernameInput.value
+            if (username) {
+                document.getElementById('login').style.display = 'none'
+                document.getElementById('chat').style.display = 'block'
+                initializeChat()
+            }
+        });
+
+        const initializeChat = () => {
+            const socket = io({
+                auth: {
+                    username: username,
+                    serverOffset: 0
+                }
+            });
+
+            socket.on('chat message', (msg, serverOffset, username) => {
+                const item = `<li><p>${msg}</p><small>${username}</small></li>`
+                messages.insertAdjacentHTML('beforeend', item)
+                socket.auth.serverOffset = serverOffset
+
+                // Hace scroll hacia abajo al recibir un mensaje
+                scrollToBottom()
+            });
+
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registrado con éxito:', registration.scope)
+                    }).catch(err => {
+                        console.log('Service Worker fallo en el registro:', err)
+                    });
+                });
+            }
+
+            socket.on('disconnect', () => {
+                console.log('Desconectado del servidor')
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault()
+                if (input.value) {
+                if (socket.connected) {
+                    socket.emit('chat message', input.value)
+                } else {
+                    const storedMessages = JSON.parse(localStorage.getItem('offlineMessages')) || []
+                    storedMessages.push({ msg: input.value, timestamp: Date.now() })
+                    localStorage.setItem('offlineMessages', JSON.stringify(storedMessages))
+                    console.log('Mensaje almacenado localmente')
+                }
+                    // Limpia el campo de entrada
+                    input.value = ''
+
+                    // Hace scroll hacia abajo al enviar un mensaje
+                    scrollToBottom()
+                }
+            });
+            // Cuando se reconecte, enviar los mensajes almacenados
+            socket.on('connect', () => {
+                const offlineMessages = JSON.parse(localStorage.getItem('offlineMessages')) || [];
+                offlineMessages.forEach(({ msg }) => {
+                    socket.emit('chat message', msg)
+                })
+                localStorage.removeItem('offlineMessages') // Limpiar los mensajes almacenados
+            })
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        :root{
+            color-scheme: light dark;
+        }
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #messages {
+            list-style-type: none;
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 0;
+            height: calc(100vh - 100px); /* Ajusta el tamaño para que se vea bien en la pantalla */
+            width: 100%;
+            max-width: 900px; /* Tamaño máximo para pantallas grandes */
+            overflow-y: auto; /* Habilitar scroll */
+            background: #cccccc00;
+        }
+        #messages > li{
+            padding: .5rem 1rem;
+        }
+        #messages > li:nth-child(odd){
+            background: #09f;
+        }
+        #chat{
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 100%; /* Ajusta el ancho al 100% del contenedor */
+            max-width: 900px; /* Ancho máximo para pantallas más grandes */
+            height: 100%;
+            position: relative;
+            margin: 0 auto; /* Centrar horizontalmente en pantallas grandes */
+        }
+        #form {
+            bottom: 0;
+            display: flex;
+            height: 48px;
+            left: 0;
+            padding: 4px;
+            right: 0;
+        }
+        #input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+        }
+        #input{
+            border-radius: 9999px;
+            border: solid 2px #eee;
+            flex: 1;
+            margin: 4px;
+            padding: 12px;
+        }
+        #input:focus {
+            outline: 0;
+        }
+        #form>button {
+            background: #09f;
+            color: #fff;
+            border: 0;
+            margin: 4px;
+            border-radius: 4px;
+        }
+        #form>button:hover {
+            background: #0cf;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="login" class="content">
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Enter your username" required>
+            <button type="submit">Login</button>
+        </form>
+    </div>
+
+    <div id="chat" class="content" style="display:none;">
+        <ul id="messages"></ul>
+        <form id="form">
+            <input id="input" autocomplete="off" placeholder="Type a message" required>
+            <button>Enviar</button>
+        </form>
+    </div>
+
+</body>
+</html>
