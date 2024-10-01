@@ -1,9 +1,8 @@
 const CACHE_NAME = 'forum-cache-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
+  './client/index.html',
   'https://cdn.socket.io/4.3.2/socket.io.esm.min.js', // Archivo de socket.io
-  '/styles.css' // Si tienes un archivo CSS, inclúyelo aquí
 ];
 
 // Instalando el Service Worker
