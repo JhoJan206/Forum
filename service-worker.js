@@ -49,7 +49,7 @@ self.addEventListener('fetch', event => {
       })
       .catch(() => {
         // Si está offline y no puede acceder a la red, sirve una página alternativa
-        return caches.match('/index.html');
+        return caches.match('.client/index.html');
       })
   );
 });
