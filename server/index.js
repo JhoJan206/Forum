@@ -51,7 +51,22 @@ io.on('connection', async (socket) => {
   
       io.emit('chat message', msg, result.lastInsertRowid.toString(), username)
     })
-  
+// Cuando se reconecte, enviar los mensajes almacenados
+socket.on('connect', () => {
+  if ('serviceWorker' in navigator && 'SyncManager' in window) {
+      navigator.serviceWorker.ready.then(registration => {
+          return registration.sync.register('sync-messages');
+      });
+  } else {
+      // Si no está disponible el service worker o la sincronización en segundo plano
+      const offlineMessages = JSON.parse(localStorage.getItem('offlineMessages')) || [];
+      offlineMessages.forEach(({ msg }) => {
+          socket.emit('chat message', msg);
+      });
+      localStorage.removeItem('offlineMessages');
+  }
+});
+
     if (!socket.recovered) { // <- recuperase los mensajes sin conexión
       try {
         const results = await db.execute({
