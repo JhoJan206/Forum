@@ -1,10 +1,10 @@
 const CACHE_NAME = 'forum-cache-v1';
 const urlsToCache = [
   '/',
-  './client/index.html',
-  'client/index.html',
-  'index.html',
-  './index.html',
+  './server/index.js',
+  'server/index.js',
+  'index.js',
+  './index.js',
   'https://cdn.socket.io/4.3.2/socket.io.esm.min.js', // Archivo de socket.io
 ];
 
