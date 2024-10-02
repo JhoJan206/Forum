@@ -3,9 +3,7 @@ const urlsToCache = [
   '/',
   './server/index.js',
   './client/index.html',
-  './index.js',
-  './index.html',
-  'https://cdn.socket.io/4.3.2/socket.io.esm.min.js', // Archivo de socket.io
+  'https://cdn.socket.io/4.3.2/socket.io.esm.min.js', // Biblioteca de socket.io
 ];
 
 // Instalando el Service Worker

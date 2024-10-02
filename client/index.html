@@ -15,11 +15,12 @@
 
         let username = ''
 
-        // Función para forzar el scroll hacia el final
+        // Función para forzar el scroll hacia el ultimo mensaje
         const scrollToBottom = () => {
             messages.scrollTop = messages.scrollHeight
         };
 
+        // guarda el nombre de usuario y muetra el chat
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault()
             username = usernameInput.value
@@ -43,7 +44,6 @@
                 messages.insertAdjacentHTML('beforeend', item)
                 socket.auth.serverOffset = serverOffset
 
-                // Hace scroll hacia abajo al recibir un mensaje
                 scrollToBottom()
             });
 
