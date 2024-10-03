@@ -2,7 +2,6 @@ import express from 'express'
 import logger from 'morgan'
 import dotenv from 'dotenv'
 import { createClient } from '@libsql/client'
-
 import { Server } from 'socket.io'
 import { createServer } from 'node:http' 
 
@@ -28,20 +27,20 @@ await db.execute(`
 `)
 
 io.on('connection', async (socket) => {
-    console.log('a user has connected!')
+    console.log('alguien se ha conectado')
   
     socket.on('disconnect', () => {
-        console.log('an user has disconnected')
+        console.log('aguien se ha desconectado')
     })
   
     socket.on('chat message', async (msg) => {
         let result
-        const username = socket.handshake.auth.username ?? 'anonymous'
-        console.log({ username })
+        const username = socket.handshake.auth.username ?? 'anonimo'
+        console.log({username})
         try {
             result = await db.execute({
             sql: 'INSERT INTO messages (content, user) VALUES (:msg, :username)',
-            args: { msg, username }
+            args: {msg, username}
             })
         } catch (e) {
             console.error(e)
@@ -51,14 +50,14 @@ io.on('connection', async (socket) => {
         io.emit('chat message', msg, result.lastInsertRowid.toString(), username)
     })
 
-    // Cuando se reconecte, enviar los mensajes almacenados
+
     socket.on('connect', () => {
-        if ('serviceWorker' in navigator && 'SyncManager' in window) {
+        if('serviceWorker' in navigator && 'SyncManager' in window){
             navigator.serviceWorker.ready.then(registration => {
                 return registration.sync.register('sync-messages');
             });
-        } else {
-            // Si no está disponible el service worker o la sincronización en segundo plano
+        } else{
+
             const offlineMessages = JSON.parse(localStorage.getItem('offlineMessages')) || [];
             offlineMessages.forEach(({ msg }) => {
                 socket.emit('chat message', msg);
@@ -67,17 +66,17 @@ io.on('connection', async (socket) => {
     }
     });
 
-    if (!socket.recovered) { // <- recuperase los mensajes sin conexión
+    if (!socket.recovered){
       try {
         const results = await db.execute({
           sql: 'SELECT id, content, user FROM messages WHERE id > ?',
           args: [socket.handshake.auth.serverOffset ?? 0]
         })
   
-        results.rows.forEach(row => {
+        results.rows.forEach(row =>{
           socket.emit('chat message', row.content, row.id.toString(), row.user)
         })
-        } catch (e) {
+        }catch (e){
         console.error(e)
         }
     }
@@ -85,11 +84,11 @@ io.on('connection', async (socket) => {
 
 app.use(logger('dev'))
 
-//para abrir el index html a ingresar a esta ruta
+
 app.get('/', (req, res)=>{
     res.sendFile('C:/Users/jacom/Documents/Proyectos/Foro De Eventos/client/index.html')
 })
 
 server.listen(port, () => {
-    console.log('server sunning on port' + port)
+    console.log('servidor en port: ' + port)
 })

@@ -113,10 +113,10 @@
             scroll-behavior: smooth;
             margin: 0;
             padding: 0;
-            height: calc(100vh - 100px); /* Ajusta el tamaño para que se vea bien en la pantalla */
+            height: calc(100vh - 100px);
             width: 100%;
-            max-width: 900px; /* Tamaño máximo para pantallas grandes */
-            overflow-y: auto; /* Habilitar scroll */
+            max-width: 900px; 
+            overflow-y: auto; 
             background: #cccccc00;
         }
         #messages > li{
@@ -129,11 +129,12 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             overflow: hidden;
-            width: 100%; /* Ajusta el ancho al 100% del contenedor */
-            max-width: 900px; /* Ancho máximo para pantallas más grandes */
+            width: 100%;
+            max-width: 900px;
             height: 100%;
             position: relative;
-            margin: 0 auto; /* Centrar horizontalmente en pantallas grandes */
+            margin: 0 auto;
+            margin-top: 10px;
         }
         #form {
             bottom: 0;
@@ -153,7 +154,6 @@
             border-radius: 9999px;
             border: solid 2px #eee;
             flex: 1;
-            margin: 4px;
             padding: 12px;
         }
         #input:focus {
@@ -163,8 +163,8 @@
             background: #09f;
             color: #fff;
             border: 0;
-            margin: 4px;
-            border-radius: 4px;
+            margin: 0px 4px;
+            border-radius: 9999px;
         }
         #form>button:hover {
             background: #0cf;
@@ -175,7 +175,7 @@
     
     <div id="login" class="content">
         <form id="loginForm">
-            <input type="text" id="username" placeholder="Ingresa tu nombre" required>
+            <input type="text" id="username" placeholder="Ingrese su nombre" required>
             <button type="submit">Login</button>
         </form>
     </div>
@@ -183,7 +183,7 @@
     <div id="chat" class="content" style="display:none;">
         <ul id="messages"></ul>
         <form id="form">
-            <input id="input" autocomplete="off" placeholder="mensaje" required>
+            <input id="input" placeholder="escribe tu mensaje" required>
             <button>Enviar</button>
         </form>
     </div>
