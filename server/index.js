@@ -3,7 +3,11 @@ import logger from 'morgan'
 import dotenv from 'dotenv'
 import { createClient } from '@libsql/client'
 import { Server } from 'socket.io'
-import { createServer } from 'node:http' 
+import { createServer } from 'node:http'
+import { join, dirname } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const __dirname = dirname(fileURLToPath(import.meta.url)) 
 
 dotenv.config()
 const port = process.env.PORT ?? 3000
@@ -15,8 +19,8 @@ const io = new Server(server, {
 })
 
 const db = createClient({
-    url: 'libsql://humble-toad-men-jhojan206.turso.io',
-    authToken: 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3Mjc3MjQ5NDIsImlkIjoiN2Y1NzMzMzktNmExYy00OThkLTg2OWItMmYwNGRlMmZkN2U0In0.86097ZhQGqeuB_WexRIwagHOhnsyAfVW3p9Ql7_-yfyh3CggJoWE5ZOac5n9cnAH7W225FsLDgcUQnQl18O_DQ'
+    url: process.env.TURSO_DB_URL,
+    authToken: process.env.TURSO_DB_TOKEN
 })
 await db.execute(`
     CREATE TABLE IF NOT EXISTS messages (
@@ -86,7 +90,7 @@ app.use(logger('dev'))
 
 
 app.get('/', (req, res)=>{
-    res.sendFile('C:/Users/jacom/Documents/Proyectos/Foro De Eventos/client/index.html')
+    res.sendFile(join(__dirname, '..', 'client', 'index.html'))
 })
 
 server.listen(port, () => {
